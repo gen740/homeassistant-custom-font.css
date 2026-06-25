@@ -32,9 +32,8 @@ function importUrl(fonts) {
 function buildCss(fonts) {
   const bodyStack = fontStack(fonts, "sans-serif");
   const codeStack = fontStack(fonts.length > 0 ? [...CODE_FONTS, ...fonts] : [], "monospace");
-  const googleImport = importUrl(fonts);
 
-  return `${googleImport ? `@import url("${googleImport}");\n\n` : ""}html {
+  return `html {
   --ha-font-family-body: ${bodyStack};
   --ha-font-family-heading: ${bodyStack};
   --ha-font-family-code: ${codeStack};
@@ -73,11 +72,24 @@ body {
 `;
 }
 
+const fontLinkId = "home-assistant-custom-font-google";
 const styleId = "home-assistant-custom-font";
+const fonts = fontsFromModuleUrl();
+const googleFontsUrl = importUrl(fonts);
+
+document.getElementById(fontLinkId)?.remove();
 document.getElementById(styleId)?.remove();
+
+if (googleFontsUrl) {
+  const link = document.createElement("link");
+  link.id = fontLinkId;
+  link.rel = "stylesheet";
+  link.href = googleFontsUrl;
+  document.head.append(link);
+}
 
 const style = document.createElement("style");
 style.id = styleId;
 style.dataset.homeAssistantCustomFont = "true";
-style.textContent = buildCss(fontsFromModuleUrl());
+style.textContent = buildCss(fonts);
 document.head.append(style);

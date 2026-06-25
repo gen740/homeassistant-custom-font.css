@@ -28,7 +28,7 @@ frontend:
     - "https://gen740.github.io/homeassistant-custom-font.css/font-loader.js?family=Roboto&family=Noto+Sans+JP"
 ```
 
-The hosted `font-loader.js` reads its own query parameters and injects a `<style>` tag into Home Assistant.
+The hosted `font-loader.js` reads its own query parameters, adds a Google Fonts `<link>`, and injects a font override `<style>` tag into Home Assistant.
 
 ## Apply to Home Assistant
 
