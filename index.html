@@ -219,7 +219,7 @@ body {
 `;
       }
 
-      function cssFilename(fonts) {
+      function cssFilename() {
         return "homeassistant-custom-font.css";
       }
 
@@ -278,8 +278,7 @@ body {
       });
 
       download.addEventListener("click", () => {
-        const fonts = parseFonts();
-        downloadText(cssFilename(fonts), output.textContent, "text/css");
+        downloadText(cssFilename(), output.textContent, "text/css");
       });
 
       render();
