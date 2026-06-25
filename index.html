@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home Assistant Custom Font CSS</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      body {
+        margin: 0;
+        background: Canvas;
+        color: CanvasText;
+      }
+
+      main {
+        width: min(960px, calc(100% - 32px));
+        margin: 32px auto;
+      }
+
+      form {
+        display: grid;
+        gap: 12px;
+        margin-block: 0 20px;
+      }
+
+      label {
+        font-weight: 650;
+      }
+
+      input {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid color-mix(in srgb, CanvasText 30%, Canvas);
+        border-radius: 6px;
+        font: inherit;
+      }
+
+      button {
+        justify-self: start;
+        padding: 9px 14px;
+        border: 1px solid color-mix(in srgb, CanvasText 30%, Canvas);
+        border-radius: 6px;
+        background: ButtonFace;
+        color: ButtonText;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      pre {
+        overflow: auto;
+        margin: 0;
+        padding: 16px;
+        border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas);
+        border-radius: 8px;
+        background: color-mix(in srgb, CanvasText 5%, Canvas);
+        line-height: 1.5;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 14px;
+      }
+
+      .hint {
+        color: color-mix(in srgb, CanvasText 70%, Canvas);
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <form id="font-form">
+        <label for="fonts">Google Font names</label>
+        <input id="fonts" name="family" autocomplete="off" value="Roboto,Noto Sans JP">
+        <div class="hint">Use repeated <code>family</code> parameters or comma separated names, for example <code>?family=Roboto&amp;family=Noto+Sans+JP</code>.</div>
+        <button type="button" id="copy">Copy CSS</button>
+      </form>
+      <pre><code id="output"></code></pre>
+    </main>
+
+    <script>
+      const form = document.querySelector("#font-form");
+      const input = document.querySelector("#fonts");
+      const output = document.querySelector("#output");
+      const copy = document.querySelector("#copy");
+
+      const defaultFonts = ["Roboto", "Noto Sans JP"];
+      const codeFonts = ["Roboto Mono"];
+
+      function parseFonts() {
+        const params = new URLSearchParams(location.search);
+        const values = params.getAll("family").flatMap((value) => value.split(","));
+        const fonts = values.map((value) => value.trim()).filter(Boolean);
+
+        return fonts.length > 0 ? fonts : defaultFonts;
+      }
+
+      function quoteFont(font) {
+        return `"${font.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`;
+      }
+
+      function googleFamily(font) {
+        return encodeURIComponent(font.trim()).replaceAll("%20", "+");
+      }
+
+      function fontStack(fonts, generic) {
+        return [...fonts.map(quoteFont), generic].join(", ");
+      }
+
+      function importUrl(fonts) {
+        const families = [...new Set([...codeFonts, ...fonts])].map((font) => {
+          return `family=${googleFamily(font)}`;
+        });
+
+        return `https://fonts.googleapis.com/css2?${families.join("&")}&display=swap`;
+      }
+
+      function buildCss(fonts) {
+        const bodyStack = fontStack(fonts, "sans-serif");
+        const codeStack = fontStack([...codeFonts, ...fonts], "monospace");
+
+        return `@import url("${importUrl(fonts)}");
+
+html {
+  --ha-font-family-body: ${bodyStack};
+  --ha-font-family-heading: ${bodyStack};
+  --ha-font-family-code: ${codeStack};
+
+  --primary-font-family: ${bodyStack};
+  --paper-font-common-base_-_font-family: ${bodyStack};
+  --mdc-typography-font-family: ${bodyStack};
+
+  font-family: ${bodyStack};
+}
+
+body {
+  font-family: ${bodyStack};
+}
+`;
+      }
+
+      function render() {
+        const fonts = parseFonts();
+        input.value = fonts.join(", ");
+        output.textContent = buildCss(fonts);
+      }
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+      });
+
+      input.addEventListener("input", () => {
+        const params = new URLSearchParams();
+        input.value.split(",").map((value) => value.trim()).filter(Boolean).forEach((font) => {
+          params.append("family", font);
+        });
+        history.replaceState(null, "", `${location.pathname}?${params}`);
+        render();
+      });
+
+      copy.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(output.textContent);
+        copy.textContent = "Copied";
+        setTimeout(() => {
+          copy.textContent = "Copy CSS";
+        }, 1200);
+      });
+
+      render();
+    </script>
+  </body>
+</html>
