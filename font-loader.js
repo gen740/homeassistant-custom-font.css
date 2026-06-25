@@ -26,7 +26,7 @@ function importUrl(fonts) {
     return `family=${googleFamily(font)}`;
   });
 
-  return families.length > 0 ? `https://fonts.googleapis.com/css2?${families.join("&")}` : "";
+  return families.length > 0 ? `https://fonts.googleapis.com/css2?${families.join("&")}&display=block` : "";
 }
 
 function buildCss(fonts) {
