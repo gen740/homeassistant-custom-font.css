@@ -33,6 +33,27 @@ html {
   --primary-font-family: "Roboto", "Noto Sans JP", sans-serif;
   --paper-font-common-base_-_font-family: "Roboto", "Noto Sans JP", sans-serif;
   --mdc-typography-font-family: "Roboto", "Noto Sans JP", sans-serif;
+  --material-font-family: "Roboto", "Noto Sans JP", sans-serif;
+
+  --md-sys-typescale-display-large-font: "Roboto", "Noto Sans JP", sans-serif;
+  --md-sys-typescale-display-medium-font: "Roboto", "Noto Sans JP", sans-serif;
+  --md-sys-typescale-display-small-font: "Roboto", "Noto Sans JP", sans-serif;
+
+  --md-sys-typescale-headline-large-font: "Roboto", "Noto Sans JP", sans-serif;
+  --md-sys-typescale-headline-medium-font: "Roboto", "Noto Sans JP", sans-serif;
+  --md-sys-typescale-headline-small-font: "Roboto", "Noto Sans JP", sans-serif;
+
+  --md-sys-typescale-title-large-font: "Roboto", "Noto Sans JP", sans-serif;
+  --md-sys-typescale-title-medium-font: "Roboto", "Noto Sans JP", sans-serif;
+  --md-sys-typescale-title-small-font: "Roboto", "Noto Sans JP", sans-serif;
+
+  --md-sys-typescale-body-large-font: "Roboto", "Noto Sans JP", sans-serif;
+  --md-sys-typescale-body-medium-font: "Roboto", "Noto Sans JP", sans-serif;
+  --md-sys-typescale-body-small-font: "Roboto", "Noto Sans JP", sans-serif;
+
+  --md-sys-typescale-label-large-font: "Roboto", "Noto Sans JP", sans-serif;
+  --md-sys-typescale-label-medium-font: "Roboto", "Noto Sans JP", sans-serif;
+  --md-sys-typescale-label-small-font: "Roboto", "Noto Sans JP", sans-serif;
 
   font-family: "Roboto", "Noto Sans JP", sans-serif;
 }
