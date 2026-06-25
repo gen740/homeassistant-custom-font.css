@@ -138,15 +138,14 @@ The quick brown fox jumps over the lazy dog.
       <section class="section" aria-labelledby="preview-heading">
         <h2 id="preview-heading">Preview</h2>
         <div id="preview" class="preview"></div>
-        <div class="preview-note">Preview uses a tofu-style final fallback so missing glyphs are easier to spot. The generated JavaScript still injects CSS with normal <code>sans-serif</code> fallback.</div>
+        <div class="preview-note">Preview uses a tofu-style final fallback so missing glyphs are easier to spot. The Home Assistant module still injects CSS with normal <code>sans-serif</code> fallback.</div>
       </section>
 
       <section class="section" aria-labelledby="css-heading">
         <div class="section-header">
-          <h2 id="css-heading">Generated JavaScript</h2>
+          <h2 id="css-heading">Generated YAML</h2>
           <div class="actions">
-            <button type="button" id="download">Download JS</button>
-            <button type="button" id="copy">Copy JS</button>
+            <button type="button" id="copy">Copy YAML</button>
           </div>
         </div>
         <pre><code id="output"></code></pre>
@@ -155,14 +154,10 @@ The quick brown fox jumps over the lazy dog.
       <section class="section" aria-labelledby="apply-heading">
         <h2 id="apply-heading">How to apply</h2>
         <ol>
-          <li>Click <strong>Download JS</strong> and save the generated file.</li>
-          <li>Put the JavaScript file under <code>/config/www/</code>.</li>
-          <li>Add it to <code>configuration.yaml</code> as a frontend extra module.</li>
+          <li>Copy the generated YAML snippet.</li>
+          <li>Add it to <code>configuration.yaml</code>.</li>
           <li>Restart Home Assistant, then hard refresh the browser or clear the frontend cache.</li>
         </ol>
-        <pre><code>frontend:
-  extra_module_url:
-    - <span id="module-url"></span></code></pre>
       </section>
     </main>
 
@@ -172,9 +167,7 @@ The quick brown fox jumps over the lazy dog.
       const sample = document.querySelector("#sample");
       const preview = document.querySelector("#preview");
       const output = document.querySelector("#output");
-      const moduleUrl = document.querySelector("#module-url");
       const copy = document.querySelector("#copy");
-      const download = document.querySelector("#download");
 
       const previewStylesheet = document.createElement("link");
       previewStylesheet.rel = "stylesheet";
@@ -263,37 +256,22 @@ body {
 `;
       }
 
-      function buildJs(fonts) {
-        const css = buildCss(fonts);
+      function moduleUrl(fonts) {
+        const params = new URLSearchParams();
+        fonts.forEach((font) => {
+          params.append("family", font);
+        });
 
-        return `(() => {
-  const id = "home-assistant-custom-font";
-  document.getElementById(id)?.remove();
-  const style = document.createElement("style");
-  style.id = id;
-  style.dataset.homeAssistantCustomFont = "true";
-  style.textContent = ${JSON.stringify(css)};
-  document.head.append(style);
-})();
+        const query = params.toString();
+        const baseUrl = `${location.origin}${location.pathname.replace(/\/[^/]*$/, "/")}font-loader.js`;
+        return query ? `${baseUrl}?${query}` : baseUrl;
+      }
+
+      function buildYaml(fonts) {
+        return `frontend:
+  extra_module_url:
+    - "${moduleUrl(fonts)}"
 `;
-      }
-
-      function jsFilename(fonts) {
-        const slug = fonts.join("-").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-        return slug ? `homeassistant-font-${slug}.js` : "homeassistant-custom-font.js";
-      }
-
-      function downloadText(filename, contents, type) {
-        const blob = new Blob([contents], { type });
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement("a");
-
-        anchor.href = url;
-        anchor.download = filename;
-        anchor.click();
-        setTimeout(() => {
-          URL.revokeObjectURL(url);
-        }, 0);
       }
 
       function updateUrl(fonts) {
@@ -311,14 +289,13 @@ body {
           input.value = fonts.join(", ");
         }
 
-        const generatedJs = buildJs(fonts);
+        const yaml = buildYaml(fonts);
         const bodyStack = previewFontStack(fonts);
 
-        output.textContent = generatedJs;
+        output.textContent = yaml;
         preview.textContent = sample.value;
         previewStylesheet.href = importUrl(fonts);
         preview.style.fontFamily = fonts.length > 0 ? fontStack(fonts, "sans-serif") : "sans-serif";
-        moduleUrl.textContent = `/local/${jsFilename(fonts)}`;
 
         if (document.fonts && fonts.length > 0) {
           Promise.all(fonts.map((font) => document.fonts.load(`22px ${quoteFont(font)}`))).then(() => {
@@ -347,12 +324,8 @@ body {
         await navigator.clipboard.writeText(output.textContent);
         copy.textContent = "Copied";
         setTimeout(() => {
-          copy.textContent = "Copy JS";
+          copy.textContent = "Copy YAML";
         }, 1200);
-      });
-
-      download.addEventListener("click", () => {
-        downloadText(jsFilename(fontsFromInput()), output.textContent, "text/javascript");
       });
 
       render(parseFonts(), { syncInput: true });
