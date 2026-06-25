@@ -16,6 +16,10 @@ Comma separated values also work:
 https://YOUR_USER.github.io/homeassistant-custom-font.css/?family=Roboto,Noto+Sans+JP
 ```
 
+Find Google Font names at <https://fonts.google.com/>.
+
+The page includes editable preview text and a button to download the generated CSS as a file.
+
 The page generates CSS like:
 
 ```css
@@ -39,3 +43,12 @@ body {
 ```
 
 GitHub Pages is static hosting, so it cannot return a dynamic `text/css` response based on query parameters. This page generates and displays the CSS client-side.
+
+## Apply to Home Assistant Dashboard
+
+1. Download the generated CSS file.
+2. Place it under `/config/www/`, for example `/config/www/homeassistant-custom-font.css`.
+3. Open Home Assistant and go to `Settings` -> `Dashboards`.
+4. Open the dashboard menu and choose `Resources`.
+5. Add `/local/homeassistant-custom-font.css` as a `Stylesheet` resource.
+6. Restart Home Assistant, then hard refresh the browser or clear the frontend cache.

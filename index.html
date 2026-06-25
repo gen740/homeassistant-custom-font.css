@@ -31,7 +31,8 @@
         font-weight: 650;
       }
 
-      input {
+      input,
+      textarea {
         box-sizing: border-box;
         width: 100%;
         padding: 10px 12px;
@@ -40,8 +41,12 @@
         font: inherit;
       }
 
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
       button {
-        justify-self: start;
         padding: 9px 14px;
         border: 1px solid color-mix(in srgb, CanvasText 30%, Canvas);
         border-radius: 6px;
@@ -49,6 +54,32 @@
         color: ButtonText;
         font: inherit;
         cursor: pointer;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .section {
+        margin-block: 24px;
+      }
+
+      .section h2 {
+        margin-block: 0 10px;
+        font-size: 18px;
+      }
+
+      .preview {
+        min-height: 120px;
+        padding: 16px;
+        border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas);
+        border-radius: 8px;
+        background: color-mix(in srgb, CanvasText 4%, Canvas);
+        font-size: 22px;
+        line-height: 1.7;
+        white-space: pre-wrap;
       }
 
       pre {
@@ -70,6 +101,11 @@
         color: color-mix(in srgb, CanvasText 70%, Canvas);
         font-size: 14px;
       }
+
+      ol {
+        padding-inline-start: 24px;
+        line-height: 1.7;
+      }
     </style>
   </head>
   <body>
@@ -77,17 +113,52 @@
       <form id="font-form">
         <label for="fonts">Google Font names</label>
         <input id="fonts" name="family" autocomplete="off" value="Roboto,Noto Sans JP">
-        <div class="hint">Use repeated <code>family</code> parameters or comma separated names, for example <code>?family=Roboto&amp;family=Noto+Sans+JP</code>.</div>
-        <button type="button" id="copy">Copy CSS</button>
+        <div class="hint">Use repeated <code>family</code> parameters or comma separated names, for example <code>?family=Roboto&amp;family=Noto+Sans+JP</code>. Find font names at <a href="https://fonts.google.com/">Google Fonts</a>.</div>
+        <label for="sample">Preview text</label>
+        <textarea id="sample">Home Assistant
+ホームアシスタント
+The quick brown fox jumps over the lazy dog.
+0123456789</textarea>
+        <div class="actions">
+          <button type="button" id="copy">Copy CSS</button>
+          <button type="button" id="download">Download CSS</button>
+        </div>
       </form>
-      <pre><code id="output"></code></pre>
+
+      <section class="section" aria-labelledby="preview-heading">
+        <h2 id="preview-heading">Preview</h2>
+        <div id="preview" class="preview"></div>
+      </section>
+
+      <section class="section" aria-labelledby="css-heading">
+        <h2 id="css-heading">Generated CSS</h2>
+        <pre><code id="output"></code></pre>
+      </section>
+
+      <section class="section" aria-labelledby="apply-heading">
+        <h2 id="apply-heading">How to apply</h2>
+        <ol>
+          <li>Click <strong>Download CSS</strong> and save the generated file.</li>
+          <li>Put the CSS file under <code>/config/www/</code>.</li>
+          <li>Open Home Assistant, then go to <strong>Settings</strong> -> <strong>Dashboards</strong> -> menu -> <strong>Resources</strong>.</li>
+          <li>Add <code>/local/homeassistant-custom-font.css</code> as a <strong>Stylesheet</strong> resource.</li>
+          <li>Restart Home Assistant, then hard refresh the browser or clear the frontend cache.</li>
+        </ol>
+      </section>
     </main>
 
     <script>
       const form = document.querySelector("#font-form");
       const input = document.querySelector("#fonts");
+      const sample = document.querySelector("#sample");
+      const preview = document.querySelector("#preview");
       const output = document.querySelector("#output");
       const copy = document.querySelector("#copy");
+      const download = document.querySelector("#download");
+
+      const previewStylesheet = document.createElement("link");
+      previewStylesheet.rel = "stylesheet";
+      document.head.append(previewStylesheet);
 
       const defaultFonts = ["Roboto", "Noto Sans JP"];
       const codeFonts = ["Roboto Mono"];
@@ -98,6 +169,10 @@
         const fonts = values.map((value) => value.trim()).filter(Boolean);
 
         return fonts.length > 0 ? fonts : defaultFonts;
+      }
+
+      function fontsFromInput() {
+        return input.value.split(",").map((value) => value.trim()).filter(Boolean);
       }
 
       function quoteFont(font) {
@@ -144,10 +219,41 @@ body {
 `;
       }
 
+      function cssFilename(fonts) {
+        return "homeassistant-custom-font.css";
+      }
+
+      function downloadText(filename, contents, type) {
+        const blob = new Blob([contents], { type });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+
+        anchor.href = url;
+        anchor.download = filename;
+        anchor.click();
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+        }, 0);
+      }
+
+      function updateUrl(fonts) {
+        const params = new URLSearchParams();
+        fonts.forEach((font) => {
+          params.append("family", font);
+        });
+        history.replaceState(null, "", `${location.pathname}?${params}`);
+      }
+
       function render() {
         const fonts = parseFonts();
         input.value = fonts.join(", ");
-        output.textContent = buildCss(fonts);
+        const css = buildCss(fonts);
+        const bodyStack = fontStack(fonts, "sans-serif");
+
+        output.textContent = css;
+        preview.textContent = sample.value;
+        preview.style.fontFamily = bodyStack;
+        previewStylesheet.href = importUrl(fonts);
       }
 
       form.addEventListener("submit", (event) => {
@@ -155,12 +261,12 @@ body {
       });
 
       input.addEventListener("input", () => {
-        const params = new URLSearchParams();
-        input.value.split(",").map((value) => value.trim()).filter(Boolean).forEach((font) => {
-          params.append("family", font);
-        });
-        history.replaceState(null, "", `${location.pathname}?${params}`);
+        updateUrl(fontsFromInput());
         render();
+      });
+
+      sample.addEventListener("input", () => {
+        preview.textContent = sample.value;
       });
 
       copy.addEventListener("click", async () => {
@@ -169,6 +275,11 @@ body {
         setTimeout(() => {
           copy.textContent = "Copy CSS";
         }, 1200);
+      });
+
+      download.addEventListener("click", () => {
+        const fonts = parseFonts();
+        downloadText(cssFilename(fonts), output.textContent, "text/css");
       });
 
       render();
