@@ -82,6 +82,12 @@
         white-space: pre-wrap;
       }
 
+      .preview-note {
+        margin-block-start: 8px;
+        color: color-mix(in srgb, CanvasText 70%, Canvas);
+        font-size: 13px;
+      }
+
       pre {
         overflow: auto;
         margin: 0;
@@ -128,6 +134,7 @@ The quick brown fox jumps over the lazy dog.
       <section class="section" aria-labelledby="preview-heading">
         <h2 id="preview-heading">Preview</h2>
         <div id="preview" class="preview"></div>
+        <div class="preview-note">Preview uses a tofu-style final fallback so missing glyphs are easier to spot. The downloaded CSS still uses normal <code>sans-serif</code> fallback.</div>
       </section>
 
       <section class="section" aria-labelledby="css-heading">
@@ -188,6 +195,10 @@ The quick brown fox jumps over the lazy dog.
         return [...fonts.map(quoteFont), generic].join(", ");
       }
 
+      function previewFontStack(fonts) {
+        return [...fonts.map(quoteFont), '"LastResort"', '"Apple Symbols"'].join(", ");
+      }
+
       function importUrl(fonts) {
         const families = [...new Set([...codeFonts, ...fonts])].map((font) => {
           return `family=${googleFamily(font)}`;
@@ -243,14 +254,18 @@ body {
         fonts.forEach((font) => {
           params.append("family", font);
         });
-        history.replaceState(null, "", `${location.pathname}?${params}`);
+
+        const query = params.toString();
+        history.replaceState(null, "", query ? `${location.pathname}?${query}` : location.pathname);
       }
 
-      function render() {
-        const fonts = parseFonts();
-        input.value = fonts.join(", ");
+      function render(fonts, options = {}) {
+        if (options.syncInput) {
+          input.value = fonts.join(", ");
+        }
+
         const css = buildCss(fonts);
-        const bodyStack = fontStack(fonts, "sans-serif");
+        const bodyStack = previewFontStack(fonts);
 
         output.textContent = css;
         preview.textContent = sample.value;
@@ -264,8 +279,9 @@ body {
       });
 
       input.addEventListener("input", () => {
-        updateUrl(fontsFromInput());
-        render();
+        const fonts = fontsFromInput();
+        updateUrl(fonts);
+        render(fonts);
       });
 
       sample.addEventListener("input", () => {
@@ -281,10 +297,10 @@ body {
       });
 
       download.addEventListener("click", () => {
-        downloadText(cssFilename(parseFonts()), output.textContent, "text/css");
+        downloadText(cssFilename(fontsFromInput()), output.textContent, "text/css");
       });
 
-      render();
+      render(parseFonts(), { syncInput: true });
     </script>
   </body>
 </html>
