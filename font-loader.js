@@ -19,19 +19,21 @@
   const codeStack = stack([...codeFonts, ...bodyFonts], "monospace");
   const variables = [
     ["--ha-font-family-body", bodyStack],
-    ["--ha-font-family-heading", bodyStack],
     ["--ha-font-family-code", codeStack],
-    ["--primary-font-family", bodyStack],
-    ["--paper-font-common-base_-_font-family", bodyStack],
-    ["--mdc-typography-font-family", bodyStack],
+    ["--ha-font-family-longform", bodyStack],
+    ["--ha-font-family-heading", bodyStack],
+    ["--md-list-item-label-text-font", "var(--ha-font-family-body)"],
+    ["--md-list-item-supporting-text-font", "var(--ha-font-family-body)"],
+    ["--md-list-item-trailing-supporting-text-font", "var(--ha-font-family-body)"],
   ];
   const css = `html {
     --ha-font-family-body: ${bodyStack};
-    --ha-font-family-heading: ${bodyStack};
     --ha-font-family-code: ${codeStack};
-    --primary-font-family: ${bodyStack};
-    --paper-font-common-base_-_font-family: ${bodyStack};
-    --mdc-typography-font-family: ${bodyStack};
+    --ha-font-family-longform: ${bodyStack};
+    --ha-font-family-heading: ${bodyStack};
+    --md-list-item-label-text-font: var(--ha-font-family-body);
+    --md-list-item-supporting-text-font: var(--ha-font-family-body);
+    --md-list-item-trailing-supporting-text-font: var(--ha-font-family-body);
     font-family: ${bodyStack};
   }
 

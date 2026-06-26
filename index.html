@@ -236,12 +236,12 @@ The quick brown fox jumps over the lazy dog.
 
         return `html {
   --ha-font-family-body: ${bodyStack};
-  --ha-font-family-heading: ${bodyStack};
   --ha-font-family-code: ${codeStack};
-
-  --primary-font-family: ${bodyStack};
-  --paper-font-common-base_-_font-family: ${bodyStack};
-  --mdc-typography-font-family: ${bodyStack};
+  --ha-font-family-longform: ${bodyStack};
+  --ha-font-family-heading: ${bodyStack};
+  --md-list-item-label-text-font: var(--ha-font-family-body);
+  --md-list-item-supporting-text-font: var(--ha-font-family-body);
+  --md-list-item-trailing-supporting-text-font: var(--ha-font-family-body);
 
   font-family: ${bodyStack};
 }
