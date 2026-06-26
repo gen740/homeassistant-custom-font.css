@@ -7,14 +7,16 @@ Single-page GitHub Pages helper for generating a Home Assistant `configuration.y
 Open the Pages URL with `family` query parameters in fallback order:
 
 ```text
-https://gen740.github.io/homeassistant-custom-font.css/?family=Roboto&family=Noto+Sans+JP
+https://gen740.github.io/homeassistant-custom-font.css/?family=Roboto&code=Roboto+Mono
 ```
 
 Comma separated values also work:
 
 ```text
-https://gen740.github.io/homeassistant-custom-font.css/?family=Roboto,Noto+Sans+JP
+https://gen740.github.io/homeassistant-custom-font.css/?family=Roboto,Noto+Sans+JP&code=Roboto+Mono
 ```
+
+`Noto Sans JP` is shown as an example fallback, but the default body font is only `Roboto`.
 
 Find Google Font names at <https://fonts.google.com/>.
 
@@ -25,7 +27,7 @@ The page generates YAML like:
 ```yaml
 frontend:
   extra_module_url:
-    - "https://gen740.github.io/homeassistant-custom-font.css/font-loader.js?family=Roboto&family=Noto+Sans+JP"
+    - "https://gen740.github.io/homeassistant-custom-font.css/font-loader.js?family=Roboto&code=Roboto+Mono"
 ```
 
 The hosted `font-loader.js` reads its own query parameters, adds a Google Fonts `<link>`, and injects a font override `<style>` tag.
@@ -38,7 +40,7 @@ The hosted `font-loader.js` reads its own query parameters, adds a Google Fonts 
 ```yaml
 frontend:
   extra_module_url:
-    - "https://gen740.github.io/homeassistant-custom-font.css/font-loader.js?family=Roboto&family=Noto+Sans+JP"
+    - "https://gen740.github.io/homeassistant-custom-font.css/font-loader.js?family=Roboto&code=Roboto+Mono"
 ```
 
 3. Restart Home Assistant, then hard refresh the browser or clear the frontend cache.
