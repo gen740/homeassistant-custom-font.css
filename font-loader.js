@@ -31,8 +31,6 @@
     font-family: ${bodyStack};
   }
   `;
-  let pending = false;
-
   const ensure = () => {
     if (googleFontsUrl) {
       const link = document.getElementById("home-assistant-custom-font-google") || document.createElement("link");
@@ -54,19 +52,7 @@
     }
   };
 
-  const scheduleEnsure = () => {
-    if (pending) {
-      return;
-    }
-    pending = true;
-    queueMicrotask(() => {
-      pending = false;
-      ensure();
-    });
-  };
-
-  // Home Assistant can add theme styles during startup. Keep this style last
-  // without removing/reloading the Google Fonts link, which can cause flicker.
-  new MutationObserver(scheduleEnsure).observe(root, { childList: true });
-  ensure();
+  // Home Assistant can add theme styles during startup. Re-check a few times
+  // early on, but do not keep a long-running observer in the SPA.
+  [0, 500, 1500, 3000].forEach((delay) => setTimeout(ensure, delay));
 })();
