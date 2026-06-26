@@ -1,8 +1,8 @@
-# Home Assistant Custom Font CSS
+# Home Assistant Custom Font
 
-Single-page GitHub Pages helper for generating a Home Assistant `configuration.yaml` snippet from Google Font names.
+Single-page GitHub Pages helper and HACS custom integration for applying Google Fonts to Home Assistant.
 
-## Usage
+## GitHub Pages Helper
 
 Open the Pages URL with `family` query parameters in fallback order:
 
@@ -20,27 +20,46 @@ https://gen740.github.io/homeassistant-custom-font.css/?family=Roboto,Noto+Sans+
 
 Find Google Font names at <https://fonts.google.com/>.
 
-The page includes editable preview text and a button to copy the generated YAML snippet.
+The page includes editable preview text and a button to copy the generated HACS configuration snippet.
 
 The page generates YAML like:
 
 ```yaml
-frontend:
-  extra_module_url:
-    - "https://gen740.github.io/homeassistant-custom-font.css/font-loader.js?family=Roboto&code=Roboto+Mono"
+homeassistant_custom_font:
+  font-family:
+    - "Roboto"
+  code-font-family:
+    - "Roboto Mono"
 ```
 
-The hosted `font-loader.js` reads its own query parameters, adds a Google Fonts `<link>`, and injects a font override `<style>` tag.
+The standalone hosted `font-loader.js` still reads its own query parameters, adds a Google Fonts `<link>`, and injects a font override `<style>` tag.
 
-## Apply to Home Assistant
+## HACS Install
 
-1. Copy the generated YAML snippet.
-2. Add it to `configuration.yaml`:
+1. Add this repository to HACS as a custom repository.
+2. Select the `Integration` category.
+3. Install `Home Assistant Custom Font`.
+4. Restart Home Assistant.
+
+## Configure Home Assistant
+
+Add only the font settings to `configuration.yaml`:
 
 ```yaml
-frontend:
-  extra_module_url:
-    - "https://gen740.github.io/homeassistant-custom-font.css/font-loader.js?family=Roboto&code=Roboto+Mono"
+homeassistant_custom_font:
+  font-family:
+    - "Roboto"
+    - "Noto Sans JP"
+  code-font-family:
+    - "Roboto Mono"
 ```
 
-3. Restart Home Assistant, then hard refresh the browser or clear the frontend cache.
+Restart Home Assistant, then hard refresh the browser or clear the frontend cache.
+
+The integration serves its bundled loader from:
+
+```text
+/homeassistant_custom_font/font-loader.js?family=Roboto&family=Noto+Sans+JP&code=Roboto+Mono
+```
+
+It registers that query URL with Home Assistant's frontend module loader automatically.

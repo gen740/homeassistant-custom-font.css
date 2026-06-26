@@ -279,16 +279,22 @@ html {
         return params.toString();
       }
 
-      function moduleUrl(fonts) {
-        const query = queryForFonts(fonts);
-        const baseUrl = `${location.origin}${location.pathname.replace(/\/[^/]*$/, "/")}font-loader.js`;
-        return query ? `${baseUrl}?${query}` : baseUrl;
+      function yamlString(value) {
+        return `"${value.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`;
+      }
+
+      function yamlList(name, values) {
+        if (values.length === 0) {
+          return `  ${name}: []`;
+        }
+
+        return `  ${name}:\n${values.map((value) => `    - ${yamlString(value)}`).join("\n")}`;
       }
 
       function buildYaml(fonts) {
-        return `frontend:
-  extra_module_url:
-    - "${moduleUrl(fonts)}"
+        return `homeassistant_custom_font:
+${yamlList("font-family", fonts.body)}
+${yamlList("code-font-family", fonts.code)}
 `;
       }
 
