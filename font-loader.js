@@ -22,6 +22,9 @@
     ["--ha-font-family-code", codeStack],
     ["--ha-font-family-longform", bodyStack],
     ["--ha-font-family-heading", bodyStack],
+    ["--primary-font-family", bodyStack],
+    ["--paper-font-common-base_-_font-family", bodyStack],
+    ["--mdc-typography-font-family", bodyStack],
     ["--md-list-item-label-text-font", bodyStack],
     ["--md-list-item-supporting-text-font", bodyStack],
     ["--md-list-item-trailing-supporting-text-font", bodyStack],
@@ -42,6 +45,9 @@
     --ha-font-family-code: ${codeStack};
     --ha-font-family-longform: ${bodyStack};
     --ha-font-family-heading: ${bodyStack};
+    --primary-font-family: ${bodyStack};
+    --paper-font-common-base_-_font-family: ${bodyStack};
+    --mdc-typography-font-family: ${bodyStack};
     --md-list-item-label-text-font: ${bodyStack};
     --md-list-item-supporting-text-font: ${bodyStack};
     --md-list-item-trailing-supporting-text-font: ${bodyStack};
