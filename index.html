@@ -239,26 +239,22 @@ The quick brown fox jumps over the lazy dog.
   --ha-font-family-code: ${codeStack};
   --ha-font-family-longform: ${bodyStack};
   --ha-font-family-heading: ${bodyStack};
-  --md-list-item-label-text-font: var(--ha-font-family-body);
-  --md-list-item-supporting-text-font: var(--ha-font-family-body);
-  --md-list-item-trailing-supporting-text-font: var(--ha-font-family-body);
+  --md-list-item-label-text-font: ${bodyStack};
+  --md-list-item-supporting-text-font: ${bodyStack};
+  --md-list-item-trailing-supporting-text-font: ${bodyStack};
 
   font-family: ${bodyStack};
 }
 
-body {
+* {
   font-family: ${bodyStack};
-}
-
-*:not(code):not(pre):not(kbd):not(samp) {
-  font-family: var(--ha-font-family-body);
 }
 
 code,
 pre,
 kbd,
 samp {
-  font-family: var(--ha-font-family-code);
+  font-family: ${codeStack};
 }
 `;
       }
