@@ -26,17 +26,7 @@
     ["--md-list-item-supporting-text-font", bodyStack],
     ["--md-list-item-trailing-supporting-text-font", bodyStack],
   ];
-  const css = `html {
-    --ha-font-family-body: ${bodyStack};
-    --ha-font-family-code: ${codeStack};
-    --ha-font-family-longform: ${bodyStack};
-    --ha-font-family-heading: ${bodyStack};
-    --md-list-item-label-text-font: ${bodyStack};
-    --md-list-item-supporting-text-font: ${bodyStack};
-    --md-list-item-trailing-supporting-text-font: ${bodyStack};
-    font-family: ${bodyStack};
-  }
-  * {
+  const css = `* {
     font-family: ${bodyStack};
   }
 
@@ -45,6 +35,17 @@
   kbd,
   samp {
     font-family: ${codeStack};
+  }
+
+  html {
+    --ha-font-family-body: ${bodyStack};
+    --ha-font-family-code: ${codeStack};
+    --ha-font-family-longform: ${bodyStack};
+    --ha-font-family-heading: ${bodyStack};
+    --md-list-item-label-text-font: ${bodyStack};
+    --md-list-item-supporting-text-font: ${bodyStack};
+    --md-list-item-trailing-supporting-text-font: ${bodyStack};
+    font-family: ${bodyStack};
   }
   `;
   const ensureHead = () => {

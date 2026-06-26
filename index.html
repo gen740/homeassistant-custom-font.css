@@ -234,7 +234,18 @@ The quick brown fox jumps over the lazy dog.
         const bodyStack = fontStack(fonts.body, "sans-serif");
         const codeStack = fontStack([...fonts.code, ...fonts.body], "monospace");
 
-        return `html {
+        return `* {
+  font-family: ${bodyStack};
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: ${codeStack};
+}
+
+html {
   --ha-font-family-body: ${bodyStack};
   --ha-font-family-code: ${codeStack};
   --ha-font-family-longform: ${bodyStack};
@@ -244,17 +255,6 @@ The quick brown fox jumps over the lazy dog.
   --md-list-item-trailing-supporting-text-font: ${bodyStack};
 
   font-family: ${bodyStack};
-}
-
-* {
-  font-family: ${bodyStack};
-}
-
-code,
-pre,
-kbd,
-samp {
-  font-family: ${codeStack};
 }
 `;
       }
