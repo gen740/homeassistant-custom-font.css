@@ -1,4 +1,4 @@
-(async () => {
+(() => {
   const params = new URL(import.meta.url).searchParams;
 
   const getFonts = (name, fallback) => {
@@ -13,13 +13,10 @@
   const stack = (fonts, generic) => [...fonts.map(quote), generic].join(", ");
   const googleFont = (font) => `family=${encodeURIComponent(font).replaceAll("%20", "+")}`;
 
-  while (!document.head) {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-
   const bodyStack = stack(bodyFonts, "sans-serif");
   const codeStack = stack([...codeFonts, ...bodyFonts], "monospace");
   const googleFontsUrl = [...new Set([...codeFonts, ...bodyFonts])].map(googleFont).join("&");
+  const root = document.head || document.documentElement;
 
   document.getElementById("home-assistant-custom-font-google")?.remove();
   document.getElementById("home-assistant-custom-font")?.remove();
@@ -29,7 +26,7 @@
     link.id = "home-assistant-custom-font-google";
     link.rel = "stylesheet";
     link.href = `https://fonts.googleapis.com/css2?${googleFontsUrl}&display=block`;
-    document.head.append(link);
+    root.append(link);
   }
 
   const style = document.createElement("style");
@@ -48,5 +45,5 @@
     font-family: ${bodyStack};
   }
   `;
-  document.head.append(style);
+  root.append(style);
 })();
