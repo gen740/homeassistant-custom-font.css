@@ -13,25 +13,27 @@
   const stack = (fonts, generic) => [...fonts.map(quote), generic].join(", ");
   const googleFont = (font) => `family=${encodeURIComponent(font).replaceAll("%20", "+")}`;
 
-  const bodyStack = stack(bodyFonts, "sans-serif");
-  const codeStack = stack([...codeFonts, ...bodyFonts], "monospace");
   const googleFontsUrl = [...new Set([...codeFonts, ...bodyFonts])].map(googleFont).join("&");
   const root = document.head || document.documentElement;
 
-  document.getElementById("home-assistant-custom-font-google")?.remove();
-  document.getElementById("home-assistant-custom-font")?.remove();
+  const install = () => {
+    const bodyStack = stack(bodyFonts, "sans-serif");
+    const codeStack = stack([...codeFonts, ...bodyFonts], "monospace");
 
-  if (googleFontsUrl) {
-    const link = document.createElement("link");
-    link.id = "home-assistant-custom-font-google";
-    link.rel = "stylesheet";
-    link.href = `https://fonts.googleapis.com/css2?${googleFontsUrl}&display=block`;
-    root.append(link);
-  }
+    document.getElementById("home-assistant-custom-font-google")?.remove();
+    document.getElementById("home-assistant-custom-font")?.remove();
 
-  const style = document.createElement("style");
-  style.id = "home-assistant-custom-font";
-  style.textContent = `html {
+    if (googleFontsUrl) {
+      const link = document.createElement("link");
+      link.id = "home-assistant-custom-font-google";
+      link.rel = "stylesheet";
+      link.href = `https://fonts.googleapis.com/css2?${googleFontsUrl}&display=block`;
+      root.append(link);
+    }
+
+    const style = document.createElement("style");
+    style.id = "home-assistant-custom-font";
+    style.textContent = `html {
     --ha-font-family-body: ${bodyStack};
     --ha-font-family-heading: ${bodyStack};
     --ha-font-family-code: ${codeStack};
@@ -45,5 +47,10 @@
     font-family: ${bodyStack};
   }
   `;
-  root.append(style);
+    root.append(style);
+  };
+
+  // Home Assistant can rewrite theme/font variables during startup.
+  // Reinstall a few times early on so this style stays last without long-running observers.
+  [0, 500, 1000, 1500].forEach((delay) => setTimeout(install, delay));
 })();
