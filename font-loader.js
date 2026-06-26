@@ -1,26 +1,19 @@
 (() => {
   const params = new URL(import.meta.url).searchParams;
+
+  const getFonts = (name, fallback) => {
+    const fonts = params.getAll(name).flatMap((value) => value.split(",")).map((value) => value.trim()).filter(Boolean);
+    return params.has(name) ? fonts : fallback;
+  };
+
   const bodyFonts = getFonts("family", ["Roboto"]);
   const codeFonts = getFonts("code", ["Roboto Mono"]);
 
-  function getFonts(name, fallback) {
-    const fonts = params.getAll(name).flatMap((value) => value.split(",")).map((value) => value.trim()).filter(Boolean);
-    return params.has(name) ? fonts : fallback;
-  }
+  const quote = (font) => `"${font.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`;
+  const stack = (fonts, generic) => [...fonts.map(quote), generic].join(", ");
+  const googleFont = (font) => `family=${encodeURIComponent(font).replaceAll("%20", "+")}`;
 
-  function quote(font) {
-    return `"${font.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`;
-  }
-
-  function stack(fonts, generic) {
-    return [...fonts.map(quote), generic].join(", ");
-  }
-
-  function googleFont(font) {
-    return `family=${encodeURIComponent(font).replaceAll("%20", "+")}`;
-  }
-
-  function apply() {
+  const apply = () => {
     if (!document.head) {
       setTimeout(apply, 100);
       return;
@@ -58,7 +51,7 @@
   }
   `;
     document.head.append(style);
-  }
+  };
 
   apply();
   setTimeout(apply, 1000);
