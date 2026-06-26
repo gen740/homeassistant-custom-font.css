@@ -15,25 +15,9 @@
 
   const googleFontsUrl = [...new Set([...codeFonts, ...bodyFonts])].map(googleFont).join("&");
   const root = document.head || document.documentElement;
-
-  const install = () => {
-    const bodyStack = stack(bodyFonts, "sans-serif");
-    const codeStack = stack([...codeFonts, ...bodyFonts], "monospace");
-
-    document.getElementById("home-assistant-custom-font-google")?.remove();
-    document.getElementById("home-assistant-custom-font")?.remove();
-
-    if (googleFontsUrl) {
-      const link = document.createElement("link");
-      link.id = "home-assistant-custom-font-google";
-      link.rel = "stylesheet";
-      link.href = `https://fonts.googleapis.com/css2?${googleFontsUrl}&display=block`;
-      root.append(link);
-    }
-
-    const style = document.createElement("style");
-    style.id = "home-assistant-custom-font";
-    style.textContent = `html {
+  const bodyStack = stack(bodyFonts, "sans-serif");
+  const codeStack = stack([...codeFonts, ...bodyFonts], "monospace");
+  const css = `html {
     --ha-font-family-body: ${bodyStack};
     --ha-font-family-heading: ${bodyStack};
     --ha-font-family-code: ${codeStack};
@@ -47,10 +31,42 @@
     font-family: ${bodyStack};
   }
   `;
-    root.append(style);
+  let pending = false;
+
+  const ensure = () => {
+    if (googleFontsUrl) {
+      const link = document.getElementById("home-assistant-custom-font-google") || document.createElement("link");
+      link.id = "home-assistant-custom-font-google";
+      link.rel = "stylesheet";
+      link.href = `https://fonts.googleapis.com/css2?${googleFontsUrl}&display=block`;
+      if (!link.isConnected) {
+        root.prepend(link);
+      }
+    }
+
+    const style = document.getElementById("home-assistant-custom-font") || document.createElement("style");
+    style.id = "home-assistant-custom-font";
+    if (style.textContent !== css) {
+      style.textContent = css;
+    }
+    if (!style.isConnected || root.lastElementChild !== style) {
+      root.append(style);
+    }
   };
 
-  // Home Assistant can rewrite theme/font variables during startup.
-  // Reinstall a few times early on so this style stays last without long-running observers.
-  [0, 500, 1000, 1500].forEach((delay) => setTimeout(install, delay));
+  const scheduleEnsure = () => {
+    if (pending) {
+      return;
+    }
+    pending = true;
+    queueMicrotask(() => {
+      pending = false;
+      ensure();
+    });
+  };
+
+  // Home Assistant can add theme styles during startup. Keep this style last
+  // without removing/reloading the Google Fonts link, which can cause flicker.
+  new MutationObserver(scheduleEnsure).observe(root, { childList: true });
+  ensure();
 })();
