@@ -40,6 +40,17 @@
   body {
     font-family: ${bodyStack};
   }
+
+  *:not(code):not(pre):not(kbd):not(samp) {
+    font-family: var(--ha-font-family-body);
+  }
+
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: var(--ha-font-family-code);
+  }
   `;
   const ensureHead = () => {
     if (googleFontsUrl) {
