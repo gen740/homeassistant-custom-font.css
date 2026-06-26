@@ -17,6 +17,14 @@
   const root = document.head || document.documentElement;
   const bodyStack = stack(bodyFonts, "sans-serif");
   const codeStack = stack([...codeFonts, ...bodyFonts], "monospace");
+  const variables = [
+    ["--ha-font-family-body", bodyStack],
+    ["--ha-font-family-heading", bodyStack],
+    ["--ha-font-family-code", codeStack],
+    ["--primary-font-family", bodyStack],
+    ["--paper-font-common-base_-_font-family", bodyStack],
+    ["--mdc-typography-font-family", bodyStack],
+  ];
   const css = `html {
     --ha-font-family-body: ${bodyStack};
     --ha-font-family-heading: ${bodyStack};
@@ -31,7 +39,7 @@
     font-family: ${bodyStack};
   }
   `;
-  const ensure = () => {
+  const ensureHead = () => {
     if (googleFontsUrl) {
       const link = document.getElementById("home-assistant-custom-font-google") || document.createElement("link");
       link.id = "home-assistant-custom-font-google";
@@ -52,7 +60,30 @@
     }
   };
 
-  // Home Assistant can add theme styles during startup. Re-check a few times
-  // early on, but do not keep a long-running observer in the SPA.
-  [0, 500, 1500, 3000].forEach((delay) => setTimeout(ensure, delay));
+  const applyVariables = () => {
+    variables.forEach(([name, value]) => {
+      if (document.documentElement.style.getPropertyValue(name) !== value) {
+        document.documentElement.style.setProperty(name, value);
+      }
+    });
+    if (document.documentElement.style.getPropertyValue("font-family") !== bodyStack) {
+      document.documentElement.style.setProperty("font-family", bodyStack);
+    }
+    if (document.body && document.body.style.getPropertyValue("font-family") !== bodyStack) {
+      document.body.style.setProperty("font-family", bodyStack);
+    }
+  };
+
+  const ensure = () => {
+    ensureHead();
+    applyVariables();
+  };
+
+  // Home Assistant writes theme variables to <html style> during startup.
+  // Watch only that attribute and restore the font variables when it changes.
+  new MutationObserver(applyVariables).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["style"],
+  });
+  ensure();
 })();
